@@ -1,14 +1,17 @@
 package com.carScan.assignment.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.carScan.assignment.exception.CarScanErrorObject;
 import com.carScan.assignment.models.User;
 import com.carScan.assignment.repository.UserRepository;
 
@@ -30,8 +33,8 @@ public class UserServiceImpl implements UserDetailsService {
 		return repository.findAll();
 	}
 
-	public User getUserById(long id) {
-		return repository.findById(id).orElse(null);
+	public Optional<User> getUserById(long id) {
+		return repository.findById(id);
 	}
 
 	public List<User> getUserByName(String name) {
@@ -45,19 +48,21 @@ public class UserServiceImpl implements UserDetailsService {
 
 	public User updateUser(User user) {
 		User existingUser = repository.findBymobileNumber(user.getMobileNumber()).orElse(null);
-		if (existingUser != null){
-			if (user.getFirstName() != null)
-				existingUser.setFirstName(user.getFirstName());
+		if (existingUser == null)
+			throw new CarScanErrorObject(HttpStatus.BAD_REQUEST, "No such user exist");
 
-			if (user.getLastName() != null)
-				existingUser.setLastName(user.getLastName());
+		if (user.getFirstName() != null)
+			existingUser.setFirstName(user.getFirstName());
 
-			if (user.getCity() != null)
-				existingUser.setCity(user.getCity());
+		if (user.getLastName() != null)
+			existingUser.setLastName(user.getLastName());
 
-			if (user.getDate() != null)
-				existingUser.setDate(user.getDate());
-		}
+		if (user.getCity() != null)
+			existingUser.setCity(user.getCity());
+
+		if (user.getDate() != null)
+			existingUser.setDate(user.getDate());
+
 		return repository.save(existingUser);
 	}
 

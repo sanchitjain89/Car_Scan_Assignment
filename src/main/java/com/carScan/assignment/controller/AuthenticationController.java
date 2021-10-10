@@ -3,21 +3,22 @@ package com.carScan.assignment.controller;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import com.carScan.assignment.service.UserServiceImpl;
 
 import com.carScan.assignment.config.TokenConfig;
+import com.carScan.assignment.exception.CarScanErrorObject;
 import com.carScan.assignment.models.AuthenticationRequest;
 import com.carScan.assignment.models.AuthenticationResponse;
+import com.carScan.assignment.service.UserServiceImpl;
 
 @RestController
 public class AuthenticationController {
@@ -41,7 +42,6 @@ public class AuthenticationController {
                 .loadUserByUsername(authenticationRequest.getMobileNumber());
 
         final String token = jwtTokenUtil.generateToken(userDetails);
-
         return ResponseEntity.ok(new AuthenticationResponse(token));
     }
 
@@ -50,10 +50,8 @@ public class AuthenticationController {
         Objects.requireNonNull(password);
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
+            throw new CarScanErrorObject(HttpStatus.BAD_REQUEST, "Invalid Credentials");
         }
     }
 }

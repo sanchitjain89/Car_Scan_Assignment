@@ -35,7 +35,7 @@ public class User {
 	
 	@Column(name = "mobile_number")
 	@NotBlank(message = "Mobile Number is mandatory")
-	@Pattern(regexp="(^$|[0-9]{10})")
+	@Pattern(regexp="(^$|[0-9]{10})", message = "Must be 10 digit number")
 	private String mobileNumber;
 
 	@Size(max = 200)
