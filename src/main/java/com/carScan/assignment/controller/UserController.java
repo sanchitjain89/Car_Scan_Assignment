@@ -1,9 +1,7 @@
 package com.carScan.assignment.controller;
 
 import java.util.List;
-import java.util.Optional;
 
-import com.carScan.assignment.models.UserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +13,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.carScan.assignment.exception.CarScanErrorObject;
 import com.carScan.assignment.models.User;
+import com.carScan.assignment.models.UserResponse;
 import com.carScan.assignment.service.UserServiceImpl;
 
-@RestController
+@RestController()
+@RequestMapping("/car_scan")
 public class UserController {
 	
 	@Autowired

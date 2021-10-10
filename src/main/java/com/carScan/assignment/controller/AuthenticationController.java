@@ -23,6 +23,7 @@ import com.carScan.assignment.models.AuthenticationResponse;
 import com.carScan.assignment.service.UserServiceImpl;
 
 @RestController
+@RequestMapping("/car_scan")
 public class AuthenticationController {
 
     @Autowired
