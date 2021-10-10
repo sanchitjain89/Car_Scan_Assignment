@@ -15,3 +15,4 @@ Future Goals
 ===========================
 - Dockerize the application
 - Role based authorization
+- Adding FT's and UT's
