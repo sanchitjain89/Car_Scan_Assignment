@@ -1,5 +1,6 @@
 package com.carScan.assignment.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.carScan.assignment.exception.CarScanErrorObject;
 import com.carScan.assignment.models.User;
+import com.carScan.assignment.models.UserResponse;
 import com.carScan.assignment.repository.UserRepository;
 
 @Service
@@ -24,29 +26,42 @@ public class UserServiceImpl implements UserDetailsService {
 	@Autowired
 	private UserRepository repository;
 
-	public User saveUser(User user) {
+	public UserResponse saveUser(User user) {
 		user.setPassword(encoder.encode(user.getPassword()));
-		return repository.save(user);
+		repository.save(user);
+		return mapUserToUserResponse(user);
 	}
 
-	public List<User> getUsers(){
-		return repository.findAll();
+	public List<UserResponse> getUsers(){
+		List<User> user = repository.findAll();
+		
+		List<UserResponse> usersResponse = new ArrayList<>();
+		
+		for (User u : user) {
+			usersResponse.add(new UserResponse(u.getId(), u.getFirstName(), u.getLastName(), u.getCity(), u.getMobileNumber(), u.getDate()));
+		}
+		
+		return usersResponse;
+
 	}
 
-	public Optional<User> getUserById(long id) {
-		return repository.findById(id);
+	public UserResponse getUserById(long id) {
+		Optional<User> user = repository.findById(id);
+		if (user.isPresent()){
+			return mapUserToUserResponse(user.get());
+		}
+		throw new CarScanErrorObject(HttpStatus.NOT_FOUND, "User not found");
 	}
 
 	public List<User> getUserByName(String name) {
 		return repository.findByfirstName(name);
 	}
 
-	public String deleteUser(long id) {
+	public void deleteUser(long id) {
 		repository.deleteById(id);
-		return "User Deleted";
 	}
 
-	public User updateUser(User user) {
+	public UserResponse updateUser(User user) {
 		User existingUser = repository.findBymobileNumber(user.getMobileNumber()).orElse(null);
 		if (existingUser == null)
 			throw new CarScanErrorObject(HttpStatus.BAD_REQUEST, "No such user exist");
@@ -63,7 +78,8 @@ public class UserServiceImpl implements UserDetailsService {
 		if (user.getDate() != null)
 			existingUser.setDate(user.getDate());
 
-		return repository.save(existingUser);
+		repository.save(existingUser);
+		return mapUserToUserResponse(existingUser);
 	}
 
 	//this method is required for JWT token
@@ -73,6 +89,19 @@ public class UserServiceImpl implements UserDetailsService {
 				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + mobileNumber));
 
 		return UserDetailsImpl.build(user);
+	}
+
+	private UserResponse mapUserToUserResponse(User user){
+		UserResponse response = new UserResponse();
+
+		response.setId(user.getId());
+		if (user.getFirstName() != null) response.setFirstName(user.getFirstName());
+		if (user.getLastName() != null) response.setLastName(user.getLastName());
+		if (user.getDate() != null) response.setDate(user.getDate());
+		if (user.getCity() != null) response.setCity(user.getCity());
+		response.setMobileNumber(user.getMobileNumber());
+
+		return response;
 	}
 
 }

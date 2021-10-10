@@ -16,7 +16,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class TokenConfig{
 
-    @Value("${authentication.token.expiration_mins}")
+    @Value("${authentication.token.expiration_sec}")
     private int TOKEN_VALIDITY_MINS;
 
     @Value("${authentication.token.secret}")
